@@ -1,0 +1,27 @@
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_time;
+
+bool around(vec2 p, float x, float y) {
+    return p.x > x - 0.1 && p.x < x + 0.1 && p.y > y - 0.1 && p.y < y + 0.1;
+}
+
+bool around(vec2 p, vec2 p2) {
+    float x = p2.x; float y = p2.y;
+    return p.x > x - 0.1 && p.x < x + 0.1 && p.y > y - 0.1 && p.y < y + 0.1;
+}
+
+void main() {
+	vec2 st = gl_FragCoord.xy/u_resolution;
+    vec2 col;
+    if (around(st, u_mouse/u_resolution)) {
+        col = vec2(0.5,0.5);
+    } else {
+         col = vec2(0.1,0.1);
+    }
+	gl_FragColor = vec4(col.x,col.y,0.0,1.0);
+}
