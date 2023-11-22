@@ -21,7 +21,7 @@ void main() {
     if (around(st, u_mouse/u_resolution, 0.01 + (0.01 * sin(5.0*u_time)))) {
         col = vec2(0.5,0.5);
     } else {
-         col = vec2(0.1,0.1);
+        col = vec2(0.1,0.1);
     }
 	gl_FragColor = vec4(col.x,col.y,0.0,1.0);
 }
