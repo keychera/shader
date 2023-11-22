@@ -1,4 +1,4 @@
-// https://thebookofshaders.com/05/?lan=jp
+// https://thebookofshaders.com/07/?lan=jp
 
 #ifdef GL_ES
 precision mediump float;
