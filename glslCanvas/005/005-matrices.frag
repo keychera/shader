@@ -35,31 +35,28 @@ mat2 scale(vec2 _scale){
                 0.0,_scale.y);
 }
 
+
+vec3 rotatingCross(in vec2 _st,in vec2 _pos) {
+    vec2 st = _st;
+    st -= vec2(0.5);
+
+    vec2 translate = -.5*_pos;
+    mat2 rotation = rotate2d( 10.0 * u_time );
+    float sc = 0.448;
+    mat2 scaling = scale( vec2(sc) );
+    
+    st = rotation * scaling *  (translate + st);
+
+    st += vec2(0.5);
+
+    return vec3(cross(st, 0.25));
+}
+
 void main(){
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     vec3 color = vec3(0.0);
 
-    // translate first then rotate?
-    // if the other way around, it behaves differently
-    // take2: and we got why, it's a different math equation after all
-
-   
-    // move space from the center to the vec2(0.0)
-    st -= vec2(0.5);
-
-    vec2 translate = 0.1 * vec2(2.0*cos(2.0*u_time),sin(4.0*u_time));
-    mat2 rotation = rotate2d( 10.0 * u_time );
-    mat2 scaling = scale( vec2(0.5 + 0.5*sin(u_time)) );
-    
-    st =  rotation * scaling * (translate + st);
-    // move it back to the original place
-    st += vec2(0.5);
-
-    // Show the coordinates of the space on the background
-    //color = vec3(st.x,st.y,0.0);
-
-    // Add the shape on the foreground
-    color += vec3(cross(st,0.25));
+    color += rotatingCross(st, vec2(0.360,0.360));
 
     gl_FragColor = vec4(color,1.0);
 }
