@@ -1,3 +1,4 @@
+// https://thebookofshaders.com/09/?lan=jp
 // Author @patriciogv ( patriciogonzalezvivo.com ) - 2015
 
 #ifdef GL_ES
@@ -60,6 +61,6 @@ void main(void){
     color -= diamond(st + vec2(0.5), dsize2);
     color -= diamond(st - vec2(0.5, -0.5), dsize2);
     color -= diamond(st - vec2(-0.5, 0.5), dsize2);
-    
+
     gl_FragColor = vec4(1.0 - color,1.0);
 }

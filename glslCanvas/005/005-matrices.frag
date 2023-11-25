@@ -1,3 +1,4 @@
+// https://thebookofshaders.com/08/?lan=jp
 // Author @patriciogv ( patriciogonzalezvivo.com ) - 2015
 
 #ifdef GL_ES
