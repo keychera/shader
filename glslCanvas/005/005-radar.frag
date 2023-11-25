@@ -56,14 +56,23 @@ vec3 blinkingCircle(in vec2 _st, in vec2 _pos) {
     return blink * vec3(circleOutline(st, 0.02, 0.5));
 }
 
+vec3 enemy(in vec2 _st, in vec2 _mouse, in vec2 _pos) {
+    float show = 1.0 - smoothstep(0.15,0.25, distance(_mouse, _pos));
+    return show * vec3(1.0, 0.0, 0.0) * 
+        (blinkingCircle(_st, _pos) + expandingCircle(_st, _pos) );
+}
+
 void main(){
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     vec3 color = vec3(0.0);
 
-    vec2 pos = u_mouse/u_resolution;
+    vec2 mouse = u_mouse/u_resolution;
+    vec2 pos = mouse;
     color += expandingCircle(st, pos);
     color += blinkingCircle(st, pos);
-    
+    color += enemy(st,mouse, vec2(0.770,0.820));
+    color += enemy(st,mouse, vec2(0.240,0.690));
+    color += enemy(st,mouse, vec2(0.830,0.210));
 
     gl_FragColor = vec4(color,1.0);
 }
