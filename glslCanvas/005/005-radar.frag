@@ -5,6 +5,7 @@ precision mediump float;
 #endif
 
 #define PI 3.14159265359
+#define blue1 vec3(0.0,0.8,0.8)
 
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
@@ -57,9 +58,27 @@ vec3 blinkingCircle(in vec2 _st, in vec2 _pos) {
 }
 
 vec3 enemy(in vec2 _st, in vec2 _mouse, in vec2 _pos) {
-    float show = 1.0 - smoothstep(0.15,0.25, distance(_mouse, _pos));
+    float show = 1.0 - smoothstep(0.15,0.35, distance(_mouse, _pos));
     return show * vec3(1.0, 0.0, 0.0) * 
         (blinkingCircle(_st, _pos) + expandingCircle(_st, _pos) );
+}
+
+float line(in vec2 _st, in float thickness) {
+    return max(0.0, step(-thickness, _st.y - abs(_st.x)) - abs(step(thickness, _st.y - _st.x)));
+}
+
+vec3 rotatingLine(in vec2 _st) {
+    vec2 pos = _st;
+    pos *= rotate2d( -u_time );
+    vec2 pos2 = pos * rotate2d(0.75 * PI);
+    
+    float a_line = 0.0;
+    a_line += line(pos, 0.005);
+    
+    float a = atan(pos2.y, pos2.x) / PI;
+    a_line += 0.8 * smoothstep(0.9, 1.0, a);
+    
+    return 0.75 * blue1 * a_line * vec3(1.);
 }
 
 void main(){
@@ -70,9 +89,22 @@ void main(){
     vec2 pos = mouse;
     color += expandingCircle(st, pos);
     color += blinkingCircle(st, pos);
-    color += enemy(st,mouse, vec2(0.770,0.820));
-    color += enemy(st,mouse, vec2(0.240,0.690));
-    color += enemy(st,mouse, vec2(0.830,0.210));
 
+
+    vec2 radarPos = st - 0.5;
+    color += blue1 * line(radarPos, 0.005);
+    color += blue1 * line(radarPos * rotate2d(0.5 * PI), 0.005);
+    color += blue1 * line(radarPos * rotate2d(PI), 0.005);
+    color += blue1 * line(radarPos * rotate2d(1.5 * PI), 0.005);
+    color += blue1 * circleOutline(radarPos, 0.2, 0.005);
+    color += blue1 * circleOutline(radarPos, 0.4, 0.005);
+    color += blue1 * circleOutline(radarPos, 0.6, 0.005);
+    
+    color += enemy(st, mouse, vec2(0.770,0.820));
+    color += enemy(st, mouse, vec2(0.240,0.690));
+    color += enemy(st, mouse, vec2(0.830,0.210));
+    
+    color += rotatingLine(radarPos);
+    
     gl_FragColor = vec4(color,1.0);
 }
