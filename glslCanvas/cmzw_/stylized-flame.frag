@@ -1,4 +1,6 @@
+#ifndef PLATFORM_WEBGL
 #define PLATFORM_WEBGL true
+#endif
 
 #ifdef GL_ES
 precision mediump float;
