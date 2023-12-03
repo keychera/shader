@@ -1,0 +1,3 @@
+[submodule "lygia"]
+	path = glslCanvas/lygia
+	url = https://github.com/patriciogonzalezvivo/lygia.git
