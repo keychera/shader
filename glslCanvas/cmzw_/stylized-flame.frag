@@ -116,10 +116,59 @@ float circle(vec2 UV, vec2 scale) {
     return 1. - length(abs((UV - 0.5) * scale) * 2.);
 }
 
+float smin( float a, float b, float k )
+{
+    float res = exp2( -k*a ) + exp2( -k*b );
+    return -log2( res )/k;
+}
+
 float remap(float in_v, float min_v, float max_v, float step_v) {
     float v = in_v * (max_v - min_v);
     return min_v + v - mod(v, max(step_v, 0.00001));
 }
+
+float tones_map(float in_v, float in_min, float in_max, float out_min, float out_max) {
+   
+    float v = min(in_min, in_v);
+    v = max(in_max, v);
+     float ratio = (in_v - in_min)/in_max;
+    return v * ratio * (out_max - out_min) / out_max;
+}
+
+float map_a(vec2 UV) {
+    vec2 UV_a = UV;
+    UV_a.y += (-u_time * 1.7) + (rand2(UV_a)*0.01);
+    return cell_min_vor(UV_a);
+}
+
+vec2 slope_with_a(vec2 UV, float epsilon) {
+	float x = map_a(fract(UV + vec2(epsilon, 0.))) - map_a(fract(UV - vec2(epsilon, 0.)));
+    float y = map_a(fract(UV + vec2(0., epsilon))) - map_a(fract(UV - vec2(0., epsilon)));
+    return vec2(x, y);
+}
+
+float map_s_a(vec2 UV) {
+    float sine_a = sin((UV.y - u_time) * 8.);
+    float sm_st_grad = smoothstep(0.3, 1., UV.y);
+    float value = sine_a * sm_st_grad;
+    return remap(value, 0.5, 1., 0.);
+}
+
+float warp_s_a_with_a(vec2 UV, float amount) {
+    vec2 sloper = slope_with_a(UV, 0.01075);
+    vec2 warper = UV + (amount * sloper);
+    return map_s_a(warper);
+}
+
+float flame_base(vec2 UV, float width) {
+    vec2 UV_a = UV;
+    UV_a.y += (-u_time * 1.7) + (rand2(UV_a)*0.01);
+    float a = cell_min_vor(UV_a);
+    float a_circle = circle(UV, vec2(2.,1.));
+    return smin(a_circle * width, a, 0.33);
+}
+
+
 
 void main() {
     // voronoise
@@ -142,15 +191,23 @@ void main() {
     value = circle(UV, vec2(1.));
     value = abs(UV.y - 0.5); //gradient
     
-    vec2 UV_tc = UV;
-
-    float circle1 = value = circle(UV_tc, vec2(2.,1.));
-    float c = value = smoothstep(0., 0.6, circle1) * a;
 	float sine_a = value = sin((UV.y - u_time) * 8.);
     float sm_st_grad = value = smoothstep(0.3, 1., UV.y);
     float s_a = value = sine_a * sm_st_grad;
-    
-    value = remap(value, 0.5, 1., 0.);
 
-	gl_FragColor = vec4(vec3(value), 1.0);
+    value = remap(value, 0.5, 1., 0.);
+    value = (warp_s_a_with_a(vec2(UV.x, UV.y + 0.32), 0.1) - 0.5) / 4.;
+    
+    float width = 30.;
+    value = flame_base(UV, width);
+    
+    value = tones_map(value, 0.1, 0.05, -1., 1.);
+    
+    float hop = 4.;
+    value = floor(hop * value)/ hop;
+    
+    vec3 color = vec3(1.);
+    color =  vec3(1.000,0.499,0.154);
+	vec3 colorize = mix(color, vec3(1.), value);
+	gl_FragColor = vec4(color * vec3(value), 1.0);
 }
