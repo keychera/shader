@@ -160,15 +160,13 @@ float warp_s_a_with_a(vec2 UV, float amount) {
     return map_s_a(warper);
 }
 
-float flame_base(vec2 UV, float width) {
+float the_c(vec2 UV, float width) {
     vec2 UV_a = UV;
     UV_a.y += (-u_time * 1.7) + (rand2(UV_a)*0.01);
     float a = cell_min_vor(UV_a);
     float a_circle = circle(UV, vec2(2.,1.));
     return smin(a_circle * width, a, 0.33);
 }
-
-
 
 void main() {
     // voronoise
@@ -189,25 +187,33 @@ void main() {
     float b = value = cell_min_vor(UV_b);
     
     value = circle(UV, vec2(1.));
-    value = abs(UV.y - 0.5); //gradient
     
 	float sine_a = value = sin((UV.y - u_time) * 8.);
+    
     float sm_st_grad = value = smoothstep(0.3, 1., UV.y);
+    
     float s_a = value = sine_a * sm_st_grad;
 
     value = remap(value, 0.5, 1., 0.);
-    value = (warp_s_a_with_a(vec2(UV.x, UV.y + 0.32), 0.1) - 0.5) / 4.;
     
+    float warp = value = warp_s_a_with_a(vec2(UV.x, UV.y), 0.1);
+    
+
     float width = 30.;
-    value = flame_base(UV, width);
+    float a_circle = value = circle(UV, vec2(2.,1.));
+    value =  smin(a_circle * width, a, 0.33); // it's the c
+    
+    vec2 UV_c = UV;
+    UV_c.x += (warp - 0.5)/2. ;
+    value = the_c(UV_c, 30.);
     
     value = tones_map(value, 0.1, 0.05, -1., 1.);
     
-    float hop = 4.;
+    float hop = 1.1;
     value = floor(hop * value)/ hop;
     
     vec3 color = vec3(1.);
     color =  vec3(1.000,0.499,0.154);
-	vec3 colorize = mix(color, vec3(1.), value);
+    
 	gl_FragColor = vec4(color * vec3(value), 1.0);
 }
